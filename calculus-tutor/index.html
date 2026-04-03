@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Calculus 12 Tutor</title>
+  <link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;600&family=Source+Sans+3:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      min-height: 100vh;
+      background: #0d1a10;
+      color: #ddd8c4;
+      font-family: 'Lora', Georgia, serif;
+      display: flex;
+      flex-direction: column;
+    }
+
+    #header {
+      padding: 18px 28px;
+      border-bottom: 1px solid #1e3322;
+      background: #0f1e13;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex-shrink: 0;
+    }
+    #logo-mark {
+      width: 40px; height: 40px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #2d5a3d, #4a8c5c);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; color: #c8e6cc; flex-shrink: 0;
+    }
+    #header h1 { font-size: 17px; font-weight: 600; color: #e8e0cc; letter-spacing: 0.01em; }
+    #header p  { font-size: 12px; color: #7a9e85; font-family: 'Source Sans 3', sans-serif; letter-spacing: 0.03em; margin-top: 2px; }
+
+    #topic-bar-wrap {
+      border-bottom: 1px solid #1a2e1e;
+      background: #0d1a10;
+      flex-shrink: 0;
+      max-height: 280px;
+      overflow-y: auto;
+    }
+    #topic-bar-header {
+      padding: 10px 28px 0;
+      font-size: 10px;
+      font-family: 'Source Sans 3', sans-serif;
+      color: #4a7a55;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    #topic-bar { padding: 8px 28px 14px; display: flex; flex-direction: column; gap: 0; }
+    .topic-group { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-bottom: 6px; }
+    .group-label {
+      font-size: 10px; font-family: 'Source Sans 3', sans-serif;
+      color: #3d6e4a; letter-spacing: 0.07em; text-transform: uppercase;
+      width: 100%; margin-top: 10px; margin-bottom: 2px; padding-left: 1px;
+    }
+    .topic-group:first-child .group-label { margin-top: 0; }
+
+    .chip {
+      padding: 5px 11px; border-radius: 4px; font-size: 12px;
+      font-family: 'Source Sans 3', sans-serif;
+      background: #132219; border: 1px solid #254530; color: #7fad8a;
+      letter-spacing: 0.01em; cursor: pointer;
+      transition: background 0.15s, border-color 0.15s, color 0.15s;
+      user-select: none;
+    }
+    .chip:hover  { background: #1c3324; border-color: #3d6e4a; color: #a8d4b0; }
+    .chip.active { background: #2d5a3d; border-color: #4a8c5c; color: #c8e6cc; }
+
+    #chat {
+      flex: 1; overflow-y: auto;
+      padding: 28px 28px 12px;
+      display: flex; flex-direction: column;
+    }
+    .msg-wrap { max-width: 720px; width: 100%; margin: 0 auto 20px; }
+
+    .label {
+      font-size: 11px; color: #4a7a55;
+      font-family: 'Source Sans 3', sans-serif;
+      letter-spacing: 0.06em; text-transform: uppercase;
+      margin-bottom: 7px;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .label-dot { width: 6px; height: 6px; border-radius: 50%; background: #3d6e4a; display: inline-block; }
+    .label-right { justify-content: flex-end; }
+
+    .bubble-user {
+      background: #1a2e1f; border: 1px solid #2a4530;
+      border-radius: 10px 10px 2px 10px;
+      padding: 12px 16px;
+      font-size: 15px; line-height: 1.65; color: #d4cebc;
+      font-family: 'Source Sans 3', sans-serif;
+      max-width: 82%; margin-left: auto;
+      white-space: pre-wrap;
+    }
+    .bubble-assistant {
+      font-size: 15px; line-height: 1.85; color: #d8d2be;
+      font-family: 'Source Sans 3', sans-serif;
+      white-space: pre-wrap;
+    }
+    .msg-image {
+      display: block; max-width: 100%; max-height: 280px;
+      border-radius: 6px; margin-bottom: 8px;
+      object-fit: contain; border: 1px solid #2a4530;
+    }
+
+    .topic-divider {
+      max-width: 720px; width: 100%;
+      margin: 4px auto 20px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .topic-divider-line  { flex: 1; height: 1px; background: #1e3322; }
+    .topic-divider-label { font-size: 11px; font-family: 'Source Sans 3', sans-serif; color: #3d6e4a; letter-spacing: 0.05em; white-space: nowrap; }
+
+    .dots { display: flex; gap: 5px; padding: 6px 0; align-items: center; }
+    .dot  { width: 7px; height: 7px; border-radius: 50%; background: #3d6e4a; animation: pulse 1.4s ease-in-out infinite; }
+    .dot:nth-child(2) { animation-delay: 0.2s; }
+    .dot:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes pulse {
+      0%, 80%, 100% { opacity: 0.3; transform: scale(0.85); }
+      40%            { opacity: 1;   transform: scale(1); }
+    }
+
+    #input-area {
+      padding: 14px 28px 22px;
+      border-top: 1px solid #1a2e1e;
+      background: #0f1e13;
+      flex-shrink: 0;
+    }
+    #input-wrap { max-width: 720px; margin: 0 auto; display: flex; flex-direction: column; gap: 8px; }
+
+    #image-preview-wrap {
+      display: none;
+      align-items: flex-start;
+      gap: 8px;
+      background: #132219;
+      border: 1px solid #254530;
+      border-radius: 8px;
+      padding: 8px 10px;
+    }
+    #image-preview-wrap.visible { display: flex; }
+    #image-preview-thumb { width: 56px; height: 56px; object-fit: cover; border-radius: 5px; border: 1px solid #2a4530; flex-shrink: 0; }
+    #image-preview-info { flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 3px; }
+    #image-preview-name { font-size: 12px; font-family: 'Source Sans 3', sans-serif; color: #a8d4b0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px; }
+    #image-preview-sub  { font-size: 11px; font-family: 'Source Sans 3', sans-serif; color: #4a7a55; }
+    #remove-image { background: none; border: none; cursor: pointer; color: #4a7a55; padding: 2px; display: flex; align-items: center; transition: color 0.15s; }
+    #remove-image:hover { color: #a8d4b0; }
+
+    #input-row { display: flex; gap: 10px; align-items: flex-end; }
+
+    #upload-btn {
+      width: 44px; height: 44px;
+      background: #132219; border: 1px solid #254530; border-radius: 8px;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; transition: background 0.15s, border-color 0.15s; color: #4a7a55;
+    }
+    #upload-btn:hover { background: #1c3324; border-color: #3d6e4a; color: #7fad8a; }
+    #upload-btn.has-image { border-color: #4a8c5c; color: #4a8c5c; background: #1a2e1f; }
+    #file-input { display: none; }
+
+    #msg-input {
+      flex: 1; background: #132219; border: 1px solid #254530; border-radius: 8px;
+      padding: 11px 14px; color: #ddd8c4; font-size: 15px;
+      font-family: 'Source Sans 3', sans-serif; line-height: 1.55;
+      resize: none; outline: none; min-height: 44px; max-height: 160px; overflow-y: auto;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    #msg-input:focus { border-color: #3d6e4a; box-shadow: 0 0 0 2px rgba(61,110,74,0.15); }
+    #msg-input::placeholder { color: #3d5e45; }
+
+    #send-btn {
+      width: 44px; height: 44px; background: #2d5a3d;
+      border: none; border-radius: 8px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; transition: background 0.15s; color: #aed6b8;
+    }
+    #send-btn:disabled { background: #1a2e1e; cursor: default; color: #3d5e45; }
+    #send-btn:not(:disabled):hover { background: #3a7050; }
+
+    #hint { max-width: 720px; margin: 9px auto 0; font-size: 11px; color: #3d5e45; font-family: 'Source Sans 3', sans-serif; text-align: center; }
+
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #1e3322; border-radius: 3px; }
+  </style>
+</head>
+<body>
+
+<div id="header">
+  <div id="logo-mark">∂</div>
+  <div>
+    <h1>Calculus 12 Tutor</h1>
+    <p>British Columbia Curriculum · Personalized Pace</p>
+  </div>
+</div>
+
+<div id="topic-bar-wrap">
+  <div id="topic-bar-header">Click a topic to jump in</div>
+  <div id="topic-bar">
+
+    <div class="topic-group">
+      <div class="group-label">Limits &amp; Continuity</div>
+      <span class="chip" data-topic="Introduction to Limits — what a limit is and how to read limit notation">Intro to Limits</span>
+      <span class="chip" data-topic="Evaluating limits algebraically and graphically">Evaluating Limits</span>
+      <span class="chip" data-topic="One-sided limits — left-hand and right-hand limits">One-Sided Limits</span>
+      <span class="chip" data-topic="Limits at infinity and horizontal asymptotes">Limits at Infinity</span>
+      <span class="chip" data-topic="Continuity — what it means for a function to be continuous and types of discontinuities">Continuity</span>
+      <span class="chip" data-topic="The Squeeze Theorem">Squeeze Theorem</span>
+    </div>
+
+    <div class="topic-group">
+      <div class="group-label">The Derivative</div>
+      <span class="chip" data-topic="The definition of the derivative using limits — the formal limit definition">Definition of the Derivative</span>
+      <span class="chip" data-topic="Derivative notation — Leibniz notation dy/dx vs prime notation f'(x)">Derivative Notation</span>
+      <span class="chip" data-topic="Differentiability — when derivatives exist and when they don't (corners, cusps, discontinuities)">Differentiability</span>
+      <span class="chip" data-topic="Derivatives as instantaneous rates of change">Rates of Change</span>
+      <span class="chip" data-topic="Tangent lines — using the derivative to find the equation of a tangent line">Tangent Lines</span>
+    </div>
+
+    <div class="topic-group">
+      <div class="group-label">Rules of Differentiation</div>
+      <span class="chip" data-topic="The Power Rule for derivatives — differentiating x^n">Power Rule</span>
+      <span class="chip" data-topic="The Product Rule for derivatives — differentiating f(x)·g(x)">Product Rule</span>
+      <span class="chip" data-topic="The Quotient Rule for derivatives — differentiating f(x)/g(x)">Quotient Rule</span>
+      <span class="chip" data-topic="The Chain Rule for derivatives — differentiating composite functions">Chain Rule</span>
+      <span class="chip" data-topic="Derivatives of trigonometric functions — sin, cos, tan and their derivatives">Trig Derivatives</span>
+      <span class="chip" data-topic="Derivatives of exponential functions — e^x and a^x">Exponential Derivatives</span>
+      <span class="chip" data-topic="Derivatives of logarithmic functions — ln(x) and log_a(x)">Log Derivatives</span>
+      <span class="chip" data-topic="Implicit differentiation — differentiating equations where y is not isolated">Implicit Differentiation</span>
+      <span class="chip" data-topic="Higher order derivatives — second derivative, third derivative and their meaning">Higher Order Derivatives</span>
+    </div>
+
+    <div class="topic-group">
+      <div class="group-label">Applications of Derivatives</div>
+      <span class="chip" data-topic="Related rates problems — using derivatives to relate changing quantities">Related Rates</span>
+      <span class="chip" data-topic="Optimization — finding maximum and minimum values using derivatives">Optimization</span>
+      <span class="chip" data-topic="Critical points — finding where f'(x) = 0 or undefined, and determining increasing/decreasing intervals">Critical Points</span>
+      <span class="chip" data-topic="Concavity and inflection points — using the second derivative to analyze curvature">Concavity &amp; Inflection</span>
+      <span class="chip" data-topic="Curve sketching — using limits, derivatives, and critical points to sketch a function">Curve Sketching</span>
+      <span class="chip" data-topic="The Mean Value Theorem — what it says and how to apply it">Mean Value Theorem</span>
+      <span class="chip" data-topic="L'Hôpital's Rule — evaluating indeterminate limits using derivatives">L'Hôpital's Rule</span>
+    </div>
+
+    <div class="topic-group">
+      <div class="group-label">Integration</div>
+      <span class="chip" data-topic="Antiderivatives and indefinite integrals — reversing differentiation">Antiderivatives</span>
+      <span class="chip" data-topic="Basic integration rules — power rule for integrals, constant rule, sum rule">Basic Integration Rules</span>
+      <span class="chip" data-topic="Integration by substitution (u-substitution) — the chain rule in reverse">U-Substitution</span>
+      <span class="chip" data-topic="Riemann sums — approximating area under a curve with rectangles, leading to the definite integral">Riemann Sums</span>
+      <span class="chip" data-topic="The Fundamental Theorem of Calculus Part 1 — the derivative of an integral">FTC Part 1</span>
+      <span class="chip" data-topic="The Fundamental Theorem of Calculus Part 2 — evaluating definite integrals using antiderivatives">FTC Part 2</span>
+      <span class="chip" data-topic="Properties of definite integrals and techniques for evaluating them">Definite Integrals</span>
+    </div>
+
+    <div class="topic-group">
+      <div class="group-label">Applications of Integration</div>
+      <span class="chip" data-topic="Area under a curve — using definite integrals to find area">Area Under a Curve</span>
+      <span class="chip" data-topic="Area between two curves — integrating the difference of two functions">Area Between Curves</span>
+      <span class="chip" data-topic="Displacement and distance — using integration with velocity and acceleration">Displacement &amp; Distance</span>
+      <span class="chip" data-topic="Average value of a function over an interval using integration">Average Value</span>
+    </div>
+
+  </div>
+</div>
+
+<div id="chat"></div>
+
+<div id="input-area">
+  <div id="input-wrap">
+    <div id="image-preview-wrap">
+      <img id="image-preview-thumb" src="" alt="preview" />
+      <div id="image-preview-info">
+        <div id="image-preview-name"></div>
+        <div id="image-preview-sub">Ready to send with your message</div>
+      </div>
+      <button id="remove-image" title="Remove image">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+    <div id="input-row">
+      <input type="file" id="file-input" accept="image/*" capture="environment" />
+      <button id="upload-btn" title="Attach a photo of an assignment or problem">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/>
+          <polyline points="21 15 16 10 5 21"/>
+        </svg>
+      </button>
+      <textarea id="msg-input" rows="1" placeholder="Ask a question, or attach a photo of your assignment…"></textarea>
+      <button id="send-btn" disabled>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="22" y1="2" x2="11" y2="13"/>
+          <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+  <p id="hint">Click a topic above · attach a photo · or type a question · Shift+Enter for new line</p>
+</div>
+
+<script>
+  const SYSTEM_PROMPT = `You are a calm, clear, and patient calculus tutor for a Grade 12 student following the British Columbia curriculum. You are not a cheerleader — you are steady, warm, and precise.
+
+TEACHING PHILOSOPHY:
+- Never rush ahead. After each concept or worked step, pause and check in: ask if it makes sense before continuing.
+- Always anchor abstract ideas in a real-world analogy or scenario BEFORE introducing formal notation.
+- Preferred real-world contexts: nature, biology, population growth and decay, ecosystems — AND tech, gaming, simulation, algorithms.
+- Use worked examples extensively. Show the full solution to at least one example before asking the student to try anything independently.
+- Keep responses focused. One concept at a time. Short paragraphs. Generous line breaks. No walls of text.
+
+WHEN THE STUDENT IS STUCK:
+1. First, ask 1–2 guiding questions. Don't give the answer — help them see the next step themselves. Wait for their response.
+2. If guiding questions don't unlock it, shift to step-by-step mode: break the problem into the smallest possible pieces and walk through each one explicitly, checking in at each step.
+
+TONE:
+- Calm, neutral, steady. Not overly enthusiastic ("Great question!" is off-brand here).
+- Clear and conversational. Explain jargon the first time you use it.
+- Dialogue-driven — you ask questions and actually wait for answers. Respond to what they say.
+
+CURRICULUM SCOPE (BC Calculus 12):
+- Limits and continuity (intuitive and formal)
+- The derivative: definition via limits, Leibniz and prime notation
+- Differentiation rules: power rule, product rule, quotient rule, chain rule
+- Derivatives of trig, exponential, and logarithmic functions
+- Implicit differentiation
+- Applications of derivatives: related rates, optimization, curve sketching (critical points, concavity, inflection)
+- Antiderivatives and indefinite integrals
+- The Fundamental Theorem of Calculus (both parts)
+- Definite integrals and area under/between curves
+- Basic integration techniques (substitution)
+- Applications of integration (area, displacement)
+
+FORMATTING:
+- Write math in plain readable text: f'(x), dy/dx, d/dx, ∫, lim(x→a), Δx, etc.
+- Use fractions like (x² + 1) / (2x) not inline LaTeX.
+- Use numbered steps when showing worked solutions.
+- Always end a concept explanation with a direct check-in question.
+
+IMAGE HANDLING:
+- When the student sends a photo of an assignment, worksheet, or textbook problem, read it carefully.
+- Identify all the questions or problems visible in the image.
+- Ask the student which specific question they want to work on, or if there's only one, begin working through it with them using your normal teaching approach.
+- Never just solve the problem outright — work through it with them.
+
+TOPIC JUMPING:
+When a student selects a topic chip, they will send a message beginning with "I'd like to study:". In that case:
+- Acknowledge the topic in one brief sentence.
+- Move directly into teaching — open with a real-world grounding analogy, then introduce the concept.
+- Do NOT ask them what they want to work on. They already told you.`;
+
+  const history = [];
+  let loading = false;
+  let activeChip = null;
+  let pendingImage = null;
+
+  const chat           = document.getElementById("chat");
+  const input          = document.getElementById("msg-input");
+  const sendBtn        = document.getElementById("send-btn");
+  const chips          = document.querySelectorAll(".chip");
+  const fileInput      = document.getElementById("file-input");
+  const uploadBtn      = document.getElementById("upload-btn");
+  const previewWrap    = document.getElementById("image-preview-wrap");
+  const previewThumb   = document.getElementById("image-preview-thumb");
+  const previewName    = document.getElementById("image-preview-name");
+  const removeImageBtn = document.getElementById("remove-image");
+
+  function scrollBottom() { chat.scrollTop = chat.scrollHeight; }
+
+  function escHtml(str) {
+    return str.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/\n/g,"<br>");
+  }
+
+  function updateSendBtn() {
+    sendBtn.disabled = loading || (!input.value.trim() && !pendingImage);
+  }
+
+  function setInputEnabled(enabled) {
+    input.disabled = !enabled;
+    uploadBtn.disabled = !enabled;
+    loading = !enabled;
+    updateSendBtn();
+    chips.forEach(c => c.style.pointerEvents = enabled ? "auto" : "none");
+  }
+
+  function setActiveChip(chip) {
+    if (activeChip) activeChip.classList.remove("active");
+    activeChip = chip;
+    if (chip) chip.classList.add("active");
+  }
+
+  function clearPendingImage() {
+    pendingImage = null;
+    previewWrap.classList.remove("visible");
+    previewThumb.src = "";
+    previewName.textContent = "";
+    uploadBtn.classList.remove("has-image");
+    fileInput.value = "";
+    updateSendBtn();
+  }
+
+  function appendMessage(role, text, imageDataUrl) {
+    const wrap = document.createElement("div");
+    wrap.className = "msg-wrap";
+    if (role === "user") {
+      let imageHtml = imageDataUrl ? `<img class="msg-image" src="${imageDataUrl}" alt="Attached image" />` : "";
+      let textHtml  = text ? `<div>${escHtml(text)}</div>` : "";
+      wrap.innerHTML = `<div class="label label-right"><span class="label-dot"></span> You</div><div class="bubble-user">${imageHtml}${textHtml}</div>`;
+    } else {
+      wrap.innerHTML = `<div class="label"><span class="label-dot"></span> Tutor</div><div class="bubble-assistant">${escHtml(text)}</div>`;
+    }
+    chat.appendChild(wrap);
+    scrollBottom();
+  }
+
+  function appendDivider(label) {
+    const div = document.createElement("div");
+    div.className = "topic-divider";
+    div.innerHTML = `<div class="topic-divider-line"></div><div class="topic-divider-label">↓ ${escHtml(label)}</div><div class="topic-divider-line"></div>`;
+    chat.appendChild(div);
+    scrollBottom();
+  }
+
+  function appendLoading() {
+    const wrap = document.createElement("div");
+    wrap.className = "msg-wrap";
+    wrap.id = "loading-msg";
+    wrap.innerHTML = `<div class="label"><span class="label-dot"></span> Tutor</div><div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>`;
+    chat.appendChild(wrap);
+    scrollBottom();
+  }
+
+  function removeLoading() {
+    const el = document.getElementById("loading-msg");
+    if (el) el.remove();
+  }
+
+  // ── Calls our Netlify function instead of Anthropic directly ──
+  async function callClaude(messages) {
+    const res = await fetch("/.netlify/functions/chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: "claude-sonnet-4-20250514",
+        max_tokens: 1000,
+        system: SYSTEM_PROMPT,
+        messages,
+      }),
+    });
+    const data = await res.json();
+    if (data.error) throw new Error(data.error.message);
+    return data.content?.find(b => b.type === "text")?.text || "";
+  }
+
+  function buildUserContent(text, image) {
+    if (!image) return text || "";
+    const content = [];
+    content.push({ type: "image", source: { type: "base64", media_type: image.mediaType, data: image.base64 } });
+    content.push({ type: "text", text: text || "I've attached a photo of my assignment. Can you help me work through it?" });
+    return content;
+  }
+
+  async function sendMessage(userText, showInChat = true, image = null) {
+    if (loading) return;
+    if (!userText && !image) return;
+
+    if (showInChat) appendMessage("user", userText, image ? image.dataUrl : null);
+    history.push({ role: "user", content: buildUserContent(userText, image) });
+
+    clearPendingImage();
+    setInputEnabled(false);
+    appendLoading();
+
+    try {
+      const reply = await callClaude(history);
+      removeLoading();
+      appendMessage("assistant", reply);
+      history.push({ role: "assistant", content: reply });
+    } catch (e) {
+      removeLoading();
+      appendMessage("assistant", "Something went wrong: " + e.message);
+    }
+
+    setInputEnabled(true);
+    input.focus();
+  }
+
+  chips.forEach(chip => {
+    chip.addEventListener("click", () => {
+      if (loading) return;
+      setActiveChip(chip);
+      appendDivider(chip.textContent.trim());
+      sendMessage(`I'd like to study: ${chip.dataset.topic}`, false);
+    });
+  });
+
+  uploadBtn.addEventListener("click", () => fileInput.click());
+  fileInput.addEventListener("change", () => {
+    const file = fileInput.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const dataUrl = e.target.result;
+      pendingImage = { base64: dataUrl.split(",")[1], mediaType: file.type || "image/jpeg", dataUrl, name: file.name };
+      previewThumb.src = dataUrl;
+      previewName.textContent = file.name;
+      previewWrap.classList.add("visible");
+      uploadBtn.classList.add("has-image");
+      updateSendBtn();
+      input.focus();
+    };
+    reader.readAsDataURL(file);
+  });
+  removeImageBtn.addEventListener("click", clearPendingImage);
+
+  input.addEventListener("input", () => {
+    input.style.height = "44px";
+    input.style.height = Math.min(input.scrollHeight, 160) + "px";
+    updateSendBtn();
+  });
+  input.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      if (!loading && (input.value.trim() || pendingImage)) {
+        const text = input.value.trim();
+        const img = pendingImage;
+        input.value = ""; input.style.height = "44px";
+        sendMessage(text, true, img);
+      }
+    }
+  });
+  sendBtn.addEventListener("click", () => {
+    if (!loading && (input.value.trim() || pendingImage)) {
+      const text = input.value.trim();
+      const img = pendingImage;
+      input.value = ""; input.style.height = "44px";
+      sendMessage(text, true, img);
+    }
+  });
+
+  async function startSession() {
+    setInputEnabled(false);
+    appendLoading();
+    try {
+      const greeting = await callClaude([{ role: "user", content: "Hello, I'm here to study calculus." }]);
+      removeLoading();
+      appendMessage("assistant", greeting);
+      history.push({ role: "user", content: "Hello, I'm here to study calculus." });
+      history.push({ role: "assistant", content: greeting });
+    } catch (e) {
+      removeLoading();
+      appendMessage("assistant", "Couldn't connect. Make sure the ANTHROPIC_API_KEY environment variable is set in Netlify and redeploy.");
+    }
+    setInputEnabled(true);
+    input.focus();
+  }
+
+  startSession();
+</script>
+</body>
+</html>
