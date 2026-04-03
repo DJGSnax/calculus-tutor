@@ -194,7 +194,7 @@
   <div id="logo-mark">∂</div>
   <div>
     <h1>Calculus 12 Tutor</h1>
-    <p>British Columbia Curriculum · Personalized Pace</p>
+    <p>Built for Lyrescale · BC Curriculum · Personalized Pace</p>
   </div>
 </div>
 
@@ -304,7 +304,7 @@
 </div>
 
 <script>
-  const SYSTEM_PROMPT = `You are a calm, clear, and patient calculus tutor for a Grade 12 student following the British Columbia curriculum. You are not a cheerleader — you are steady, warm, and precise.
+  const SYSTEM_PROMPT = `You are a calm, clear, and patient calculus tutor for a Grade 12 student named Lyrescale. Address her by name occasionally — naturally, not constantly.
 
 TEACHING PHILOSOPHY:
 - Never rush ahead. After each concept or worked step, pause and check in: ask if it makes sense before continuing.
@@ -546,7 +546,7 @@ When a student selects a topic chip, they will send a message beginning with "I'
     setInputEnabled(false);
     appendLoading();
     try {
-      const greeting = await callClaude([{ role: "user", content: "Hello, I'm here to study calculus." }]);
+      const greeting = await callClaude([{ role: "user", content: "Hello, my name is Lyrescale and I'm here to study calculus." }]);
       removeLoading();
       appendMessage("assistant", greeting);
       history.push({ role: "user", content: "Hello, I'm here to study calculus." });
