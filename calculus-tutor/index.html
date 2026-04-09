@@ -5,6 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Calculus 12 Tutor</title>
   <link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;600&family=Source+Sans+3:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css" />
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js" onload="katexReady=true"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -101,6 +104,9 @@
       font-size: 15px; line-height: 1.85; color: #d8d2be;
       font-family: 'Source Sans 3', sans-serif;
       white-space: pre-wrap;
+    }
+    .bubble-assistant .katex-display {
+      margin: 0.6em 0;
     }
     .msg-image {
       display: block; max-width: 100%; max-height: 280px;
@@ -304,7 +310,7 @@
 </div>
 
 <script>
-  const SYSTEM_PROMPT = `You are a calm, clear, and patient calculus tutor for a Grade 12 student named Lyrescale. Address her by name occasionally — naturally, not constantly.
+  const SYSTEM_PROMPT = `You are a calm, clear, and patient calculus tutor for a Grade 12 student named Lyrescale, following the British Columbia curriculum. Address her by name occasionally — naturally, not constantly. You are not a cheerleader — you are steady, warm, and precise.
 
 TEACHING PHILOSOPHY:
 - Never rush ahead. After each concept or worked step, pause and check in: ask if it makes sense before continuing.
@@ -313,15 +319,14 @@ TEACHING PHILOSOPHY:
 - Use worked examples extensively. Show the full solution to at least one example before asking the student to try anything independently.
 - Keep responses focused. One concept at a time. Short paragraphs. Generous line breaks. No walls of text.
 
-WHEN THE STUDENT IS STUCK:
-1. First, ask 1–2 guiding questions. Don't give the answer — help them see the next step themselves. Wait for their response.
+WHEN LYRESCALE IS STUCK:
+1. First, ask 1–2 guiding questions. Don't give the answer — help her see the next step herself. Wait for her response.
 2. If guiding questions don't unlock it, shift to step-by-step mode: break the problem into the smallest possible pieces and walk through each one explicitly, checking in at each step.
 
 TONE:
-TONE:
 - Calm, neutral, steady. Not overly enthusiastic ("Great question!" is off-brand here).
 - Clear and conversational. Explain jargon the first time you use it.
-- Dialogue-driven — you ask questions and actually wait for answers. Respond to what they say.
+- Dialogue-driven — you ask questions and actually wait for answers. Respond to what she says.
 - Lyrescale has a dry, biting sense of humor. Match it occasionally — a deadpan observation, a wry aside, a mild joke at the expense of whoever invented the quotient rule. Keep it sparse so it lands. Never force it. Never be silly. Think: a good teacher who happens to be quietly funny, not a tutor trying to be entertaining.
 - If Lyrescale goes off-topic — asks about anything unrelated to calculus or math — redirect her back with dry humor. Don't lecture her. Just make it clear, with a straight face, that you have exactly one area of expertise and it isn't whatever she just asked about. One line is enough. Then steer back to the math.
 
@@ -339,22 +344,23 @@ CURRICULUM SCOPE (BC Calculus 12):
 - Applications of integration (area, displacement)
 
 FORMATTING:
-- Write math in plain readable text: f'(x), dy/dx, d/dx, ∫, lim(x→a), Δx, etc.
-- Use fractions like (x² + 1) / (2x) not inline LaTeX.
+- Write ALL math using LaTeX notation so it renders properly for Lyrescale.
+- Use $...$ for inline math, for example: $f'(x)$, $\\frac{dy}{dx}$, $\\lim_{x \\to a}$, $\\int f(x)\\,dx$
+- Use $$...$$ on its own line for display equations, for example: $$\\frac{d}{dx}[x^n] = nx^{n-1}$$
 - Use numbered steps when showing worked solutions.
 - Always end a concept explanation with a direct check-in question.
 
 IMAGE HANDLING:
-- When the student sends a photo of an assignment, worksheet, or textbook problem, read it carefully.
+- When Lyrescale sends a photo of an assignment, worksheet, or textbook problem, read it carefully.
 - Identify all the questions or problems visible in the image.
-- Ask the student which specific question they want to work on, or if there's only one, begin working through it with them using your normal teaching approach.
-- Never just solve the problem outright — work through it with them.
+- Ask her which specific question she wants to work on, or if there's only one, begin working through it using your normal teaching approach.
+- Never just solve the problem outright — work through it with her.
 
 TOPIC JUMPING:
-When a student selects a topic chip, they will send a message beginning with "I'd like to study:". In that case:
+When Lyrescale selects a topic chip, she will send a message beginning with "I'd like to study:". In that case:
 - Acknowledge the topic in one brief sentence.
 - Move directly into teaching — open with a real-world grounding analogy, then introduce the concept.
-- Do NOT ask them what they want to work on. They already told you.`;
+- Do NOT ask her what she wants to work on. She already told you.`;
 
   const history = [];
   let loading = false;
@@ -376,6 +382,18 @@ When a student selects a topic chip, they will send a message beginning with "I'
 
   function escHtml(str) {
     return str.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/\n/g,"<br>");
+  }
+
+  function renderMath(el) {
+    if (typeof renderMathInElement !== "undefined") {
+      renderMathInElement(el, {
+        delimiters: [
+          { left: "$$", right: "$$", display: true },
+          { left: "$", right: "$", display: false },
+        ],
+        throwOnError: false,
+      });
+    }
   }
 
   function updateSendBtn() {
@@ -417,6 +435,7 @@ When a student selects a topic chip, they will send a message beginning with "I'
       wrap.innerHTML = `<div class="label"><span class="label-dot"></span> Tutor</div><div class="bubble-assistant">${escHtml(text)}</div>`;
     }
     chat.appendChild(wrap);
+    renderMath(wrap);
     scrollBottom();
   }
 
@@ -442,7 +461,6 @@ When a student selects a topic chip, they will send a message beginning with "I'
     if (el) el.remove();
   }
 
-  // ── Calls our Netlify function instead of Anthropic directly ──
   async function callClaude(messages) {
     const res = await fetch("/.netlify/functions/chat", {
       method: "POST",
@@ -552,7 +570,7 @@ When a student selects a topic chip, they will send a message beginning with "I'
       const greeting = await callClaude([{ role: "user", content: "Hello, my name is Lyrescale and I'm here to study calculus." }]);
       removeLoading();
       appendMessage("assistant", greeting);
-      history.push({ role: "user", content: "Hello, I'm here to study calculus." });
+      history.push({ role: "user", content: "Hello, my name is Lyrescale and I'm here to study calculus." });
       history.push({ role: "assistant", content: greeting });
     } catch (e) {
       removeLoading();
